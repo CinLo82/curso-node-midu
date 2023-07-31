@@ -1,28 +1,26 @@
 {
-  "name": "curso-node",
+  "name": "curso-node-midu",
   "version": "1.0.0",
-  "description": "curso nodeJs de MiduDev",
+  "description": "<div align=\"center\">\r \t<img alt=\"Curso de Node.js desde cero y práctico\" src=\"https://github-production-user-asset-6210df.s3.amazonaws.com/1561955/254806429-8ff74316-d49e-4358-8b1e-07d7b5a64ed4.jpeg\" width=\"500\">",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "(https://github.com/CinLo82/curso-node-midu)"
+    "url": "git+https://github.com/CinLo82/curso-node-midu.git"
   },
-  "keywords": [
-    "nodeJs"
-  ],
-  "author": "cinlo",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
-  "dependencies": {
-    "picocolors": "^1.0.0"
+  "bugs": {
+    "url": "https://github.com/CinLo82/curso-node-midu/issues"
   },
+  "homepage": "https://github.com/CinLo82/curso-node-midu#readme",
   "devDependencies": {
-    "standart": "^6.1.0"
+    "standard": "^17.1.0"
   },
   "eslintConfig": {
-    "extends": "./node_modules/standard/eslintrc.json"
+    "extends": "standard"
   }
-
 }
