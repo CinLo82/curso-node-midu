@@ -9,10 +9,14 @@ const processRequest = (req, res) => {
   switch (method) {
     case 'GET':
       switch (url) {
-        case '/pokemon/ditto': {
+        case '/pokemon/ditto':
+
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
-          return res.end(JSON.stringify(dittoJson))
-        }
+          return res.end(JSON.stringify(dittoJSON))
+        default:
+          res.statusCode = 404
+          res.setHeader('Content-Type', 'text/html; charset=utf-8')
+          return res.end('<h1>404</h1>')
       }
 
     case 'POST':
@@ -20,15 +24,17 @@ const processRequest = (req, res) => {
         case '/pokemon': {
           let body = ''
 
-          // escuchar el evento
+          // escuchar el evento data
           req.on('data', chunk => {
             body += chunk.toString()
           })
 
           req.on('end', () => {
             const data = JSON.parse(body)
-            // llamar a una base de datos
+            // llamar a una base de datos para guardar la info
             res.writeHead(201, { 'Content-Type': 'application/json; charset=utf-8' })
+
+            data.timestamp = Date.now()
             res.end(JSON.stringify(data))
           })
 
@@ -38,7 +44,7 @@ const processRequest = (req, res) => {
         default:
           res.statusCode = 404
           res.setHeader('Content-Type', 'text/plain; charset=utf-8')
-          return res.end('404, Not Found')
+          return res.end('404 Not Found')
       }
   }
 }
