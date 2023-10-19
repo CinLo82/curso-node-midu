@@ -1,6 +1,8 @@
 import mysql from 'mysql2/promise'
 import dotenv from 'dotenv'
 
+dotenv.config()
+
 const config = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -8,16 +10,39 @@ const config = {
   port: parseInt(process.env.DB_PORT),
   database: process.env.DB_DATABASE
 }
-dotenv.config()
 
 const connection = await mysql.createConnection(config)
 
 export class MovieModel {
   static async getAll ({ genre }) {
+    console.log('getAll')
+
+    if (genre) {
+      const lowerCaseGenre = genre.toLowerCase()
+
+      // get genre ids from database table using genre names
+      const [genres] = await connection.query(
+        'SELECT id, name FROM genre WHERE LOWER(name) = ?;',
+        [lowerCaseGenre]
+      )
+
+      // no genre found
+      if (genres.length === 0) return []
+
+      // get the id from the first genre result
+      const [{ id }] = genres
+
+      // get all movies ids from database table
+      // la query a movie_genres
+      // join
+      // y devolver resultados..
+      return []
+    }
+
     const [movies] = await connection.query(
-      // get genre ids from database table using genre name
-      'SELECT title, year, director, duration, poster, rate, BIN_TO_UUID(id) id from movie;'
+      'SELECT title, year, director, duration, poster, rate, BIN_TO_UUID(id) id FROM movie;'
     )
+
     return movies
   }
 
@@ -30,6 +55,7 @@ export class MovieModel {
     )
 
     if (movies.length === 0) return null
+
     return movies[0]
   }
 
@@ -64,8 +90,10 @@ export class MovieModel {
   }
 
   static async delete ({ id }) {
+    // crear el ejercicio
   }
 
   static async update ({ id, input }) {
+    // crear el ejercicio
   }
 }
