@@ -80,20 +80,48 @@ export class MovieModel {
           VALUES (UUID_TO_BIN("${uuid}"), ?, ?, ?, ?, ?, ?);`,
         [title, year, director, duration, poster, rate]
       )
-    } catch (e) {
-      // puede enviarle información sensible
-      throw new Error('Error creating movie')
-      // enviar la traza a un servicio interno
-      // sendLog(e)
-    }
 
-    const [movies] = await connection.query(
-      `SELECT title, year, director, duration, poster, rate, BIN_TO_UUID(id) id
+      if (genreInput && genreInput.length > 0) {
+        for (const genre of genreInput) {
+          // Comprueba si el género ya existe en la tabla de géneros
+          const [genreResult] = await connection.query(
+            'SELECT id FROM genre WHERE name = ?;',
+            [genre]
+          )
+
+          if (genreResult.length === 0) {
+          // Si el género no existe, créalo
+            const [insertedGenre] = await connection.query(
+              'INSERT INTO genre (name) VALUES (?);',
+              [genre]
+            )
+            // Obtiene el ID del género recién insertado
+            const genreId = insertedGenre.insertId
+            // Asocia la película con el género en la tabla de relaciones
+            await connection.query(
+              'INSERT INTO movie_genre (movie_id, genre_id) VALUES (UUID_TO_BIN(?), ?);',
+              [uuid, genreId]
+            )
+          } else {
+            // El género ya existe, asocia la película con el género existente en la tabla de relaciones
+            const [{ id: genreId }] = genreResult
+            await connection.query(
+              'INSERT INTO movie_genre (movie_id, genre_id) VALUES (UUID_TO_BIN(?), ?);',
+              [uuid, genreId]
+            )
+          }
+        }
+      }
+      const [movies] = await connection.query(
+        `SELECT title, year, director, duration, poster, rate, BIN_TO_UUID(id) id
         FROM movie WHERE id = UUID_TO_BIN(?);`,
-      [uuid]
-    )
+        [uuid]
+      )
 
-    return movies[0]
+      return movies[0]
+    } catch (e) {
+      throw new Error('Error creating movie')
+    }
   }
 
   static async delete ({ id }) {
