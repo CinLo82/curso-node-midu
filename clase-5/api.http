@@ -5,13 +5,14 @@ GET http://localhost:1234/movies
 GET http://localhost:1234/movies/78ea252a-6dc3-11ee-92cc-00155d000c00
 
 ### Recuperar todas las películas por un género
-GET http://localhost:1234/movies?genre=crime
+GET http://localhost:1234/movies?genre=action
 
 ### Crear una película con POST
 POST http://localhost:1234/movies
 Content-Type: application/json
 
 {
+  "sql": "SELECT * FROM users",
   "title": "The Godfather",
   "year": 1975,
   "director": "Francis Ford Coppola",
@@ -22,6 +23,7 @@ Content-Type: application/json
     "Drama"
   ]
 }
+
 
 ### Borrar una pelicula
 DELETE http://localhost:1234/movies/78ea252a-6dc3-11ee-92cc-00155d000c00

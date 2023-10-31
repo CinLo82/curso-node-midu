@@ -1,9 +1,6 @@
 import mysql from 'mysql2/promise'
-import dotenv from 'dotenv'
 
-dotenv.config()
-
-const config = {
+const DEFAULT_CONFIG = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -11,7 +8,9 @@ const config = {
   database: process.env.DB_DATABASE
 }
 
-const connection = await mysql.createConnection(config)
+const connectionString = process.env.DATABASE_URL ?? DEFAULT_CONFIG
+
+const connection = await mysql.createConnection(connectionString)
 
 export class MovieModel {
   static async getAll ({ genre }) {
@@ -60,31 +59,40 @@ export class MovieModel {
 
   static async create ({ input }) {
     const {
+      genre: genreInput, // genre is an array
       title,
       year,
-      director,
       duration,
-      poster,
-      rate
+      director,
+      rate,
+      poster
     } = input
 
-    const [uuiResult] = await connection.query('SELECT UUID() uuid;')
-    const [{ uuid }] = uuiResult
+    // todo: crear la conexión de genre
+
+    // crypto.randomUUID()
+    const [uuidResult] = await connection.query('SELECT UUID() uuid;')
+    const [{ uuid }] = uuidResult
 
     try {
       await connection.query(
-        `INSERT INTO movie (id, title, year, director, duration, poster, rate)' + 'VALUES ( UUID_TO_BIN("${uuid}"), ?, ?, ?, ?, ?, ?)`,
-        [uuid, title, year, director, duration, poster, rate]
+        `INSERT INTO movie (id, title, year, director, duration, poster, rate)
+          VALUES (UUID_TO_BIN("${uuid}"), ?, ?, ?, ?, ?, ?);`,
+        [title, year, director, duration, poster, rate]
       )
     } catch (e) {
+      // puede enviarle información sensible
       throw new Error('Error creating movie')
+      // enviar la traza a un servicio interno
+      // sendLog(e)
     }
 
     const [movies] = await connection.query(
-      `SELECT title, year, director, duration, poster, rate, BIN_TO_UUID(id) id' +
-      'FROM movie WHERE id = UUID_TO_BIN(?)`,
+      `SELECT title, year, director, duration, poster, rate, BIN_TO_UUID(id) id
+        FROM movie WHERE id = UUID_TO_BIN(?);`,
       [uuid]
     )
+
     return movies[0]
   }
 
