@@ -4,6 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>cinlo-chat</title>
+    <script type="module">
+        import { io } from 'https://cdn.socket.io/4.3.2/socket.io.esm.min.js'
+
+        const socket = io()
+
+        const form = document.getElementById('form')
+        const input = document.getElementById('input')
+        const messages = document.getElementById('messages')
+
+        socket.on('chat message', (msg) => {
+            const item = `<li>${msg}</li>`
+            messages.insertAdjacentHTML('beforeend', item)
+        })
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            if (input.value) {
+                socket.emit('sendMessage', input.value)
+                input.value = ''
+            }
+        })
+    </script>
+
     <style>
         *,
         *::before,
@@ -21,7 +45,7 @@
             display: grid;
             place-content: center;
             height: 100hv;
-            padding: 36px;
+            padding: 36px 36px 100px 36px;
             grid-template-rows: 1fr;
         }
 
@@ -30,13 +54,70 @@
             border-radius: 4px;
             overflow: hidden;
             width: 350px;
-            height: 100vh;
+            height: 80vh;
             position: relative;
         }
+
+        #form {
+            bottom: 0;
+            display: flex;
+            height: 48px;
+            left: 0;
+            padding: 4px;
+            position: absolute;
+            right: 0;
+        }
+
+        #input {
+            border-radius: 9999px;
+            border: 1px solid #eee;
+            flex: 1;
+            margin: 4px;
+            padding: 0, 8px;
+        }
+
+        #input:focus {
+            outline: 0;
+        }
+
+        #form > button {
+            background-color: #09f;
+            color: #fff;
+            border: none;
+            margin: 4px;
+            border-radius: 4px;
+        }
+
+        #form > button {
+            background-color: #09f;
+        }
+
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow-y: scroll;
+            height: 100%;
+            scroll-behavior: smooth;
+            padding-bottom: 48px;
+        }
+
+        #messages>li {
+            padding: .5rem 1rem;
+        }
+
+        #messages>li:nth-child(odd) {
+            background: #000;
+        }
+
+
+
+       
     </style>
 </head>
 <body>
     <section id="chat">
+        <ul id="messages"></ul>
         <form id="form">
             <input type="text" id="input" placeholder="Type a message..." autocomplete="off"/>
             <button type="submit">Send</button>
